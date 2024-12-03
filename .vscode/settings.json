@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "calculate_angle.h": "c",
+        "read_sensors.h": "c"
+    }
+}
