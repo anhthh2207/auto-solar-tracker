@@ -9,5 +9,5 @@ Group 10:
 - Anh Quan Pham  
 
 Documentations
-- [Project proposal](docs\Embedded_Project_Proposal.pdf)
+- [Project proposal](docs/Embedded_Project_Proposal.pdf)
 
