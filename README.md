@@ -8,10 +8,6 @@ Group 10:
 - Chu Ha Linh
 - Anh Quan Pham  
 
-
-Materials:
-- Motor control:
-    -   https://github.com/smalik007/Servo-controlled-by-Tiva-C-Series-ARM-Cortex-M3-/blob/master/README.md
-    - https://www.youtube.com/watch?v=67RXmJ5iOyg
-
+Documentations
+- [Project proposal](docs\Embedded_Project_Proposal.pdf)
 

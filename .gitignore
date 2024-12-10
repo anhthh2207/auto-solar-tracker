@@ -1,0 +1,7 @@
+# ignore redunt files and directories
+
+/Debug/
+/.settings/
+/.launches/
+
+*.lib
