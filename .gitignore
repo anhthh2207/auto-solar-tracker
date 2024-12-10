@@ -1,4 +1,4 @@
-# ignore redunt files and directories
+# ignore redundant files and directories
 
 /Debug/
 /.settings/
