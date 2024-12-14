@@ -8,7 +8,6 @@
 #include "driverlib/interrupt.h"
 #include "driverlib/gpio.h"
 #include "inc/hw_gpio.h"
-#include "driverlib/timer.h"
 #include "driverlib/pin_map.h"
 
 #include "control_motor.h"

@@ -95,3 +95,10 @@ void set_motor_angle(int angle) {
 
     PWMPulseWidthSet(motorPWM_config.pwmBase, motorPWM_config.pwmOut, pulseWidth);
 }
+
+
+/*
+ * Documents:
+ * https://blog.wokwi.com/learn-servo-motor-using-wokwi-logic-analyzer/
+ * https://electronics.stackexchange.com/questions/346603/driving-servo-motor-with-pwm-signal
+ */
