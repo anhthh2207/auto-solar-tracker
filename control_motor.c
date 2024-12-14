@@ -9,29 +9,73 @@
 #include "inc/hw_gpio.h"
 #include "driverlib/pwm.h"
 #include "driverlib/pin_map.h"
-
 #include "control_motor.h"
 
-#define PWM_FREQUENCY 50
-#define MIN_PULSE_PERCENT 3.5f
-#define MAX_PULSE_PERCENT 13.0f
+#define PWM_FREQUENCY 50                // motor control signal = 50 Hz
+#define MIN_PULSE_PERCENT 3.5f          // minimum duty cycle percentage
+#define MAX_PULSE_PERCENT 13.0f         // maximum duty cycle percentage
 
-uint32_t pwmClock;
-uint32_t period;
+typedef struct PWMConfig {
+    uint32_t gpioPeripheral;            // GPIO peripheral
+    uint32_t pwmPeripheral;             // PWM peripheral
+    uint32_t gpioBase;                  // GPIO port base
+    uint32_t gpioPin;                   // GPIO pin
+    uint32_t pinConfig;                 // Pin configuration
+    uint32_t pwmGen;                    // PWM generator
+    uint32_t pwmOutBit;                 // PWM output bit
+    uint32_t pwmOut;
+    uint32_t pwmBase;                   // PWM module base
+    uint32_t pwmMode;                   // count up/down mode
+    uint32_t pwdDiv;
+} PWMConfig;
 
-void configure_PWM(void) {
-    SysCtlPWMClockSet(SYSCTL_PWMDIV_64);
+static const PWMConfig motorPWM_config = {
+    .gpioPeripheral = SYSCTL_PERIPH_GPIOB,
+    .pwmPeripheral = SYSCTL_PERIPH_PWM0,
+    .gpioBase = GPIO_PORTB_BASE,
+    .gpioPin = GPIO_PIN_6,
+    .pinConfig = GPIO_PB6_M0PWM0,
+    .pwmGen = PWM_GEN_0,
+    .pwmOutBit = PWM_OUT_0_BIT,
+    .pwmOut = PWM_OUT_0,
+    .pwmBase = PWM0_BASE,
+    .pwmMode = PWM_GEN_MODE_DOWN,
+    .pwdDiv = SYSCTL_PWMDIV_64
+};
+static uint32_t pwmClock;
+static uint32_t period;
 
-    PWMGenConfigure(PWM0_BASE, PWM_GEN_0, PWM_GEN_MODE_DOWN);
+
+/*
+ * Configure PWM generator (ouput 0, module 0, generator 0)
+ *
+ * Output signal pin: PB6
+ * PMW clock = system clock / 64
+ *
+ */
+void init_PWM(void) {
+    SysCtlPeripheralEnable(motorPWM_config.gpioPeripheral);
+
+    SysCtlPeripheralEnable(motorPWM_config.pwmPeripheral);
+    GPIOPinTypePWM(motorPWM_config.gpioBase, motorPWM_config.gpioPin);
+    GPIOPinConfigure(motorPWM_config.pinConfig);
+
+    SysCtlPWMClockSet(motorPWM_config.pwdDiv);
+
+    PWMGenConfigure(motorPWM_config.pwmBase, motorPWM_config.pwmGen, motorPWM_config.pwmMode);
 
     pwmClock = SysCtlClockGet() / 64;
     period = (pwmClock / PWM_FREQUENCY) - 1;
-    PWMGenPeriodSet(PWM0_BASE, PWM_GEN_0, period);
+    PWMGenPeriodSet(motorPWM_config.pwmBase, motorPWM_config.pwmGen, period);
 
-    PWMOutputState(PWM0_BASE, PWM_OUT_0_BIT, true);
-    PWMGenEnable(PWM0_BASE, PWM_GEN_0);
+    PWMOutputState(motorPWM_config.pwmBase, motorPWM_config.pwmOutBit, true);
+    PWMGenEnable(motorPWM_config.pwmBase, motorPWM_config.pwmGen);
 }
 
+
+/*
+ * Calculate duty percentage given target angle
+ */
 float calculate_pulse_percent(int angle) {
     if (angle < 0) {
         angle = 0;
@@ -42,10 +86,12 @@ float calculate_pulse_percent(int angle) {
     return MIN_PULSE_PERCENT + ((float)angle / 180.0f) * (MAX_PULSE_PERCENT - MIN_PULSE_PERCENT);
 }
 
+
+/*
+ * Execute rotations given angle
+ */
 void set_motor_angle(int angle) {
     uint32_t pulseWidth = (uint32_t)(calculate_pulse_percent(angle) * period / 100.0f);
 
-    PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, pulseWidth);
+    PWMPulseWidthSet(motorPWM_config.pwmBase, motorPWM_config.pwmOut, pulseWidth);
 }
-
-
