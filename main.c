@@ -75,49 +75,24 @@
 
 #include "read_sensors.h"
 
-//volatile uint32_t adcValues[4];
-//volatile float input_voltage = 0.0, calculated_resistance = 0.0;
-//char acBuffer[50];
-//
-//
-//void calculate_resistence(void);
-////void send_data(void);
-//void Timer0AIntHandler(void);
+void Timer0AIntHandler(void);
+
 
 int main(void)
 {
     // sys clk = 40 MHz
     SysCtlClockSet(SYSCTL_SYSDIV_5 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
 
-//    // Configure peripherals
-//    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
-//    GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_3); // PE3 as ADC input
+      config_ADC();
 
-//    // config adc
-//    SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
-//    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
-//    GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_3);
-//    ADCSequenceConfigure(ADC0_BASE, 1, ADC_TRIGGER_PROCESSOR, 0);
-//    ADCSequenceStepConfigure(ADC0_BASE, 1, 0, ADC_CTL_CH0);
-//    ADCSequenceStepConfigure(ADC0_BASE, 1, 1, ADC_CTL_CH0);
-//    ADCSequenceStepConfigure(ADC0_BASE, 1, 2, ADC_CTL_CH0);
-//    ADCSequenceStepConfigure(ADC0_BASE, 1, 3, ADC_CTL_CH0 | ADC_CTL_IE | ADC_CTL_END);
-//    ADCSequenceEnable(ADC0_BASE, 1);
-//    ADCHardwareOversampleConfigure(ADC0_BASE, 4);
-//
-//    // config timer
-//    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
-//    TimerConfigure(TIMER0_BASE, TIMER_CFG_PERIODIC);
-//    TimerLoadSet(TIMER0_BASE, TIMER_A, SysCtlClockGet() / 10 - 1); //sampling rate = 5 Hz
-//    TimerIntRegister(TIMER0_BASE, TIMER_A, Timer0AIntHandler);
-//    TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
-//    TimerEnable(TIMER0_BASE, TIMER_A);
-//
-//    // enable global interrupts
-//    IntMasterEnable();
-
-    config_ADC();
-    IntMasterEnable();
+    // config timer
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
+    TimerConfigure(TIMER0_BASE, TIMER_CFG_PERIODIC);
+    TimerLoadSet(TIMER0_BASE, TIMER_A, SysCtlClockGet() / 10 - 1); //sampling rate = 5 Hz
+    TimerIntRegister(TIMER0_BASE, TIMER_A, Timer0AIntHandler);
+    TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
+    TimerEnable(TIMER0_BASE, TIMER_A);
+    // enable global interrupts
     IntMasterEnable();
 
     while (1)
@@ -126,28 +101,11 @@ int main(void)
     }
 }
 
+void Timer0AIntHandler(void)
+{
+    TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
 
-//void calculate_resistence(void)
-//{
-//    float avg_adc_value = (adcValues[0] + adcValues[1] + adcValues[2] + adcValues[3]) / 4.0;
-//    input_voltage = avg_adc_value * (3.3 / 4096.0);
-//    float ref_res = 10000.0;
-//    calculated_resistance = ref_res * (input_voltage / (3.3));
-//}
-//
-//
-//
-//void Timer0AIntHandler(void)
-//{
-//    TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
-//
-//    ADCProcessorTrigger(ADC0_BASE, 1);
-//    while (!ADCIntStatus(ADC0_BASE, 1, false));
-//    ADCIntClear(ADC0_BASE, 1);
-//    ADCSequenceDataGet(ADC0_BASE, 1, (uint32_t *)adcValues);
-//
-//    // calculate and send resistance
-//    calculate_resistence();
-////    send_data();
-//}
+    update_sensors_data();
+}
+
 
