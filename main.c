@@ -19,23 +19,6 @@
 #include "read_sensors.h"
 #include "calculate_angle.h"
 
-//int update_new_angle(int angle, float ldr1, float ldr2) {
-//    if (ldr1 - ldr2 > 10 * ldr2 / 100) {
-//        angle += 2;
-//    } else if (ldr2 - ldr1 > 10* ldr1 / 100) {
-//        angle -= 2;
-//    }
-//
-//    // clamp the angle
-//    if (angle < 0) {
-//        angle = 0;
-//    } else if (angle > 180) {
-//        angle = 180;
-//    }
-//
-//    return angle;
-//}
-
 void Timer0AIntHandler(void);
 void SysTickIntHandler(void);
 void init_hardware(void);
@@ -52,6 +35,9 @@ int main(void)
 
     config_ADC();
 
+    float pulse = calculate_pulse_percent(angle);
+    set_motor_angle(angle);
+    
 //    // config timer
 //    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
 //    TimerConfigure(TIMER0_BASE, TIMER_CFG_PERIODIC);
@@ -61,11 +47,6 @@ int main(void)
 //    TimerEnable(TIMER0_BASE, TIMER_A);
 //    // enable global interrupts
 //    IntMasterEnable();
-
-
-    float pulse = calculate_pulse_percent(angle);
-    set_motor_angle(angle);
-
     SysTickPeriodSet((SysCtlClockGet()/ get_sampling_rate()) - 1);
     SysTickIntEnable();
     IntMasterEnable();
