@@ -98,7 +98,7 @@ void set_motor_angle(int angle) {
 
 
 /*
- * Documents:
+ * Reference documents:
  * https://blog.wokwi.com/learn-servo-motor-using-wokwi-logic-analyzer/
  * https://electronics.stackexchange.com/questions/346603/driving-servo-motor-with-pwm-signal
  */
