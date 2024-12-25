@@ -3,7 +3,8 @@
 
 void config_ADC(void);
 void calculate_resistance(void);
-//void Timer0AIntHandler(void);
 void update_sensors_data(void);
+float get_sampling_rate(void);
+float* get_ldr_data(void);
 
 #endif
