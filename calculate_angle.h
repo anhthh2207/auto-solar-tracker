@@ -1,6 +1,6 @@
-#ifdef CALCULATE_ANGLE_H
+#ifndef CALCULATE_ANGLE_H
 #define CALCULATE_ANGLE_H
 
-void calculate_angle();
+int update_new_angle(int , float , float);
 
 #endif

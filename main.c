@@ -12,12 +12,20 @@
 #include "driverlib/adc.h"
 #include "driverlib/timer.h"
 #include "driverlib/uart.h"
+#include "driverlib/systick.h"
+#include "driverlib/pwm.h"
 
 #include "control_motor.h"
 #include "read_sensors.h"
+#include "calculate_angle.h"
 
 void Timer0AIntHandler(void);
+void SysTickIntHandler(void);
 void init_hardware(void);
+
+int angle = 90; // Initial angle
+float ldr1;
+float ldr2;
 
 
 int main(void)
@@ -27,57 +35,54 @@ int main(void)
 
     config_ADC();
 
-    // config timer
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
-    TimerConfigure(TIMER0_BASE, TIMER_CFG_PERIODIC);
-    TimerLoadSet(TIMER0_BASE, TIMER_A, SysCtlClockGet() / 5 - 1); //sampling rate = 1 Hz
-    TimerIntRegister(TIMER0_BASE, TIMER_A, Timer0AIntHandler);
-    TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
-    TimerEnable(TIMER0_BASE, TIMER_A);
-    // enable global interrupts
+    float pulse = calculate_pulse_percent(angle);
+    set_motor_angle(angle);
+    
+//    // config timer
+//    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
+//    TimerConfigure(TIMER0_BASE, TIMER_CFG_PERIODIC);
+//    TimerLoadSet(TIMER0_BASE, TIMER_A, SysCtlClockGet() / get_sampling_rate() - 1); // sampling and angle update rate
+//    TimerIntRegister(TIMER0_BASE, TIMER_A, Timer0AIntHandler);
+//    TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
+//    TimerEnable(TIMER0_BASE, TIMER_A);
+//    // enable global interrupts
+//    IntMasterEnable();
+    SysTickPeriodSet((SysCtlClockGet()/ get_sampling_rate()) - 1);
+    SysTickIntEnable();
     IntMasterEnable();
-
-//    int angle = 0; // Initial angle
-//    float pulse = calculate_pulse_percent(angle);
-//    set_motor_angle(angle);
+    SysTickEnable();
 
     while (1) {
-//        if (GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_4) == 0x00) {
-//            angle-=10;
-//            if (angle <= 0) {
-//                angle = 0;
-//            }
-//            SysCtlDelay(100000);
-//        }
-//
-//        if (GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_0) == 0x00) {
-//            angle+=10;
-//            if (angle >= 180) {
-//                angle = 180;
-//            }
-//            SysCtlDelay(100000);
-//        }
-//        set_motor_angle(angle);
+        // main program
+        // set_motor_angle(angle);
     }
 }
 
 
-void Timer0AIntHandler(void)
-{
-    TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
+//void Timer0AIntHandler(void)
+//{
+//    TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
+//
+//    update_sensors_data();
+//    ldr1 = get_ldr_data()[0];
+//    ldr2 = get_ldr_data()[1];
+//
+//    angle = update_new_angle(angle, ldr1, ldr2);
+//    set_motor_angle(angle);
+//}
 
+void SysTickIntHandler(void)
+{
     update_sensors_data();
+    ldr1 = get_ldr_data()[0];
+    ldr2 = get_ldr_data()[1];
+
+    angle = update_new_angle(angle, ldr1, ldr2);
+    set_motor_angle(angle);
 }
+
 
 void init_hardware() {
     SysCtlClockSet(SYSCTL_SYSDIV_5 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ);
-
-    // GPIO F
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
-    HWREG(GPIO_PORTF_BASE + GPIO_O_LOCK) = GPIO_LOCK_KEY;
-    HWREG(GPIO_PORTF_BASE + GPIO_O_CR) |= 0x01;
-    HWREG(GPIO_PORTF_BASE + GPIO_O_LOCK) = 0;
-    GPIODirModeSet(GPIO_PORTF_BASE, GPIO_PIN_4|GPIO_PIN_0, GPIO_DIR_MODE_IN);
-    GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_4|GPIO_PIN_0, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
 }
 
