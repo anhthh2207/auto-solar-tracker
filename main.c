@@ -59,17 +59,17 @@ int main(void)
 }
 
 
-void Timer0AIntHandler(void)
-{
-    TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
-
-    update_sensors_data();
-    ldr1 = get_ldr_data()[0];
-    ldr2 = get_ldr_data()[1];
-
-    angle = update_new_angle(angle, ldr1, ldr2);
-    set_motor_angle(angle);
-}
+//void Timer0AIntHandler(void)
+//{
+//    TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
+//
+//    update_sensors_data();
+//    ldr1 = get_ldr_data()[0];
+//    ldr2 = get_ldr_data()[1];
+//
+//    angle = update_new_angle(angle, ldr1, ldr2);
+//    set_motor_angle(angle);
+//}
 
 void SysTickIntHandler(void)
 {
