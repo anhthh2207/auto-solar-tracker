@@ -9,8 +9,8 @@ Group 10:
 - Anh Quan Pham  
 
 Pins Assignments
-- ADC pins: PE1, PE2
-- PWM output: PB6
+- ADC pins: PE3, PE4
+- PWM output: PF2
 
 Create your own setup by modifying config variables in [control_motor.c](control_motor.c) and [read_sensors.c](read_sensors.c)
 
