@@ -62,15 +62,6 @@ void config_ADC(void) {
 
     // ADC sequence should adapt to your own sequencer and input pins
     // see  Table13-1 and Table 13-2 (https://www.ti.com/lit/ds/symlink/tm4c123gh6pm.pdf?ts=1695554778406&ref_url=https%253A%252F%252Fwww.google.com%252F)
-//    ADCSequenceConfigure(adc_config.adc_base, adc_config.sequencer, ADC_TRIGGER_PROCESSOR, 0);  // trigger ADC
-//    ADCSequenceStepConfigure(adc_config.adc_base, adc_config.sequencer, 0, adc_config.adc_channels[0]);
-//    ADCSequenceStepConfigure(adc_config.adc_base, adc_config.sequencer, 1, adc_config.adc_channels[1]);
-//    ADCSequenceStepConfigure(adc_config.adc_base, adc_config.sequencer, 2, adc_config.adc_channels[2]);
-//    ADCSequenceStepConfigure(adc_config.adc_base, adc_config.sequencer, 3, adc_config.adc_channels[3]);
-//    ADCSequenceStepConfigure(adc_config.adc_base, adc_config.sequencer, 4, adc_config.adc_channels[0]);
-//    ADCSequenceStepConfigure(adc_config.adc_base, adc_config.sequencer, 5, adc_config.adc_channels[1]);
-//    ADCSequenceStepConfigure(adc_config.adc_base, adc_config.sequencer, 6, adc_config.adc_channels[2]);
-//    ADCSequenceStepConfigure(adc_config.adc_base, adc_config.sequencer, 7, adc_config.adc_channels[3] | ADC_CTL_IE | ADC_CTL_END); // stop sampling
     ADCSequenceConfigure(adc_config.adc_base, adc_config.sequencer, ADC_TRIGGER_PROCESSOR, 0);  // trigger ADC
     ADCSequenceStepConfigure(adc_config.adc_base, adc_config.sequencer, 0, adc_config.adc_channels[0]);
     ADCSequenceStepConfigure(adc_config.adc_base, adc_config.sequencer, 1, adc_config.adc_channels[1]);
