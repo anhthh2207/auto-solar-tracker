@@ -29,6 +29,20 @@ typedef struct PWMConfig {
     uint32_t pwdDiv;
 } PWMConfig;
 
+//static const PWMConfig motorPWM_config = {
+//    .gpioPeripheral = SYSCTL_PERIPH_GPIOB,
+//    .pwmPeripheral = SYSCTL_PERIPH_PWM0,
+//    .gpioBase = GPIO_PORTB_BASE,
+//    .gpioPin = GPIO_PIN_6,
+//    .pinConfig = GPIO_PB6_M0PWM0,
+//    .pwmGen = PWM_GEN_0,
+//    .pwmOutBit = PWM_OUT_0_BIT,
+//    .pwmOut = PWM_OUT_0,
+//    .pwmBase = PWM0_BASE,
+//    .pwmMode = PWM_GEN_MODE_DOWN,
+//    .pwdDiv = SYSCTL_PWMDIV_64
+//};
+
 static const PWMConfig motorPWM_config = {
     .gpioPeripheral = SYSCTL_PERIPH_GPIOB,
     .pwmPeripheral = SYSCTL_PERIPH_PWM0,
@@ -42,6 +56,7 @@ static const PWMConfig motorPWM_config = {
     .pwmMode = PWM_GEN_MODE_DOWN,
     .pwdDiv = SYSCTL_PWMDIV_64
 };
+
 static uint32_t pwmClock;
 static uint32_t period;
 
@@ -53,6 +68,24 @@ static uint32_t period;
  * PMW clock = system clock / 64
  *
  */
+//void init_PWM(void) {
+//    SysCtlPeripheralEnable(motorPWM_config.gpioPeripheral);
+//
+//    SysCtlPeripheralEnable(motorPWM_config.pwmPeripheral);
+//    GPIOPinTypePWM(motorPWM_config.gpioBase, motorPWM_config.gpioPin);
+//    GPIOPinConfigure(motorPWM_config.pinConfig);
+//
+//    SysCtlPWMClockSet(motorPWM_config.pwdDiv);
+//
+//    PWMGenConfigure(motorPWM_config.pwmBase, motorPWM_config.pwmGen, motorPWM_config.pwmMode);
+//
+//    pwmClock = SysCtlClockGet() / 64;
+//    period = (pwmClock / PWM_FREQUENCY) - 1;
+//    PWMGenPeriodSet(motorPWM_config.pwmBase, motorPWM_config.pwmGen, period);
+//
+//    PWMOutputState(motorPWM_config.pwmBase, motorPWM_config.pwmOutBit, true);
+//    PWMGenEnable(motorPWM_config.pwmBase, motorPWM_config.pwmGen);
+//}
 void init_PWM(void) {
     SysCtlPeripheralEnable(motorPWM_config.gpioPeripheral);
 
@@ -102,3 +135,7 @@ void set_motor_angle(int angle) {
  * https://blog.wokwi.com/learn-servo-motor-using-wokwi-logic-analyzer/
  * https://electronics.stackexchange.com/questions/346603/driving-servo-motor-with-pwm-signal
  */
+
+
+
+

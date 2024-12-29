@@ -19,13 +19,15 @@
 #include "read_sensors.h"
 #include "calculate_angle.h"
 
-void Timer0AIntHandler(void);
 void SysTickIntHandler(void);
 void init_hardware(void);
 
 int angle = 90; // Initial angle
 float ldr1;
 float ldr2;
+float ldr3;
+float ldr4;
+float pannel_vol;
 
 
 int main(void)
@@ -38,15 +40,6 @@ int main(void)
     float pulse = calculate_pulse_percent(angle);
     set_motor_angle(angle);
     
-//    // config timer
-//    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
-//    TimerConfigure(TIMER0_BASE, TIMER_CFG_PERIODIC);
-//    TimerLoadSet(TIMER0_BASE, TIMER_A, SysCtlClockGet() / get_sampling_rate() - 1); // sampling and angle update rate
-//    TimerIntRegister(TIMER0_BASE, TIMER_A, Timer0AIntHandler);
-//    TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
-//    TimerEnable(TIMER0_BASE, TIMER_A);
-//    // enable global interrupts
-//    IntMasterEnable();
     SysTickPeriodSet((SysCtlClockGet()/ get_sampling_rate()) - 1);
     SysTickIntEnable();
     IntMasterEnable();
@@ -58,24 +51,14 @@ int main(void)
     }
 }
 
-
-//void Timer0AIntHandler(void)
-//{
-//    TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
-//
-//    update_sensors_data();
-//    ldr1 = get_ldr_data()[0];
-//    ldr2 = get_ldr_data()[1];
-//
-//    angle = update_new_angle(angle, ldr1, ldr2);
-//    set_motor_angle(angle);
-//}
-
 void SysTickIntHandler(void)
 {
     update_sensors_data();
     ldr1 = get_ldr_data()[0];
     ldr2 = get_ldr_data()[1];
+    ldr3 = get_ldr_data()[2];
+    ldr4 = get_ldr_data()[3];
+    pannel_vol = get_pannel_voltage();
 
     angle = update_new_angle(angle, ldr1, ldr2);
     set_motor_angle(angle);
