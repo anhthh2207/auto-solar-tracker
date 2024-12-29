@@ -19,19 +19,24 @@
 #include "read_sensors.h"
 #include "calculate_angle.h"
 
-void Timer0AIntHandler(void);
 void SysTickIntHandler(void);
 void init_hardware(void);
+void setup_UART(void);
+void send_message(void);
+
+char acBuffer[200];
 
 int angle = 90; // Initial angle
 float ldr1;
 float ldr2;
+volatile float pannel_vol = 0;
 
 
 int main(void)
 {
     init_hardware();
     init_PWM();
+    setup_UART();
 
     config_ADC();
 
@@ -55,9 +60,12 @@ void SysTickIntHandler(void)
     update_sensors_data();
     ldr1 = get_ldr_data()[0];
     ldr2 = get_ldr_data()[1];
+    pannel_vol = get_pannel_voltage();
 
     angle = update_new_angle(angle, ldr1, ldr2);
     set_motor_angle(angle);
+
+    send_message();
 }
 
 
@@ -65,3 +73,33 @@ void init_hardware() {
     SysCtlClockSet(SYSCTL_SYSDIV_5 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ);
 }
 
+void setup_UART(void) {
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+
+    GPIOPinConfigure(GPIO_PA0_U0RX);
+    GPIOPinConfigure(GPIO_PA1_U0TX);
+    GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+
+    UARTConfigSetExpClk(UART0_BASE, SysCtlClockGet(), 115200, (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE));
+}
+
+void send_message(void) {
+//    uint32_t noBytes = sprintf(acBuffer, "LDR0: %.2f\t LDR1: %.2f\t Angle0: %d\t LDR3: %.2f\t LDR4: %.2f\t Angle1: %d\t SolarVol: %.4f\n", ldr0, ldr1, angle0, ldr2, ldr3, angle1, pannel_vol);
+//    uint32_t noBytes = sprintf(acBuffer, "V202100405 - %d\n", (uint32_t)(ldr0));
+//    uint32_t idx;
+//    for (idx = 0; idx < noBytes; idx++)
+//    {
+//        UARTCharPut(UART0_BASE, acBuffer[idx]);
+//    }
+
+    const char *studentID = "V202100405";
+    uint32_t idx = 0;
+
+    while (studentID[idx] != '\0')
+    {
+        UARTCharPut(UART0_BASE, studentID[idx]);
+        idx++;
+    }
+
+}

@@ -12,7 +12,7 @@
 #include "driverlib/interrupt.h"
 #include "read_sensors.h"
 
-#define NUM_CHANNELS 2
+#define NUM_CHANNELS 3
 
 typedef struct {
     uint32_t gpio_peripheral ;                  // GPIO peripheral
@@ -36,8 +36,8 @@ const ADC_Config adc_config = {
     .gpio_port_base = GPIO_PORTE_BASE,
 //    .adc_pins = {GPIO_PIN_1, GPIO_PIN_2, GPIO_PIN_3, GPIO_PIN_4}, // PE1, PE2, PE3, PE4
 //    .adc_channels = {ADC_CTL_CH2, ADC_CTL_CH1, ADC_CTL_CH0, ADC_CTL_CH9}, // AIN2, AIN1, AIN0, AIN9
-    .adc_pins = {GPIO_PIN_3, GPIO_PIN_4}, // PE3, PE4
-    .adc_channels = {ADC_CTL_CH0, ADC_CTL_CH9}, // AIN0, AIN9
+    .adc_pins = {GPIO_PIN_3, GPIO_PIN_4, GPIO_PIN_5}, // PE3, PE4
+    .adc_channels = {ADC_CTL_CH0, ADC_CTL_CH9, ADC_CTL_CH8}, // AIN0, AIN9
     .num_channels = 4,
     .sampling_rate = 40,      // 40 Hz
     .oversampling = 8,
@@ -47,6 +47,7 @@ const ADC_Config adc_config = {
 volatile uint32_t adcValues[8];
 volatile float input_voltage = 0.0;
 volatile float calculated_resistance[4] = {0, 0, 0, 0};
+volatile float  pannel_voltage = 0;
 
 
 void config_ADC(void) {
@@ -66,7 +67,8 @@ void config_ADC(void) {
     ADCSequenceStepConfigure(adc_config.adc_base, adc_config.sequencer, 0, adc_config.adc_channels[0]);
     ADCSequenceStepConfigure(adc_config.adc_base, adc_config.sequencer, 1, adc_config.adc_channels[1]);
     ADCSequenceStepConfigure(adc_config.adc_base, adc_config.sequencer, 2, adc_config.adc_channels[0]);
-    ADCSequenceStepConfigure(adc_config.adc_base, adc_config.sequencer, 3, adc_config.adc_channels[1] | ADC_CTL_IE | ADC_CTL_END); // stop sampling
+    ADCSequenceStepConfigure(adc_config.adc_base, adc_config.sequencer, 3, adc_config.adc_channels[1]);
+    ADCSequenceStepConfigure(adc_config.adc_base, adc_config.sequencer, 4, adc_config.adc_channels[2] | ADC_CTL_IE | ADC_CTL_END); // stop sampling
     ADCSequenceEnable(adc_config.adc_base, adc_config.sequencer);
     ADCHardwareOversampleConfigure(adc_config.adc_base, adc_config.oversampling);
 }
@@ -79,6 +81,7 @@ void update_sensors_data(void){
     ADCSequenceDataGet(adc_config.adc_base, adc_config.sequencer, (uint32_t *)adcValues);
 
     calculate_resistance();
+    calculate_pannel_voltage();
 }
 
 
@@ -100,4 +103,13 @@ float* get_ldr_data(void){
     return (float*)  calculated_resistance;
 }
 
+void calculate_pannel_voltage(void){
+    float avg_adc_value = adcValues[NUM_CHANNELS-1];
+    float input_voltage = avg_adc_value * (3.3 / 4096.0);
+    pannel_voltage = input_voltage;
+}
+
+float get_pannel_voltage(void){
+    return pannel_voltage;
+}
 
