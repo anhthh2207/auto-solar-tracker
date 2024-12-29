@@ -22,11 +22,12 @@
 void SysTickIntHandler(void);
 void init_hardware(void);
 
-int angle = 90; // Initial angle
+int angle0 = 90; // Initial angle
+int angle1 = 90;
+float ldr0;
 float ldr1;
 float ldr2;
 float ldr3;
-float ldr4;
 float pannel_vol;
 
 
@@ -34,11 +35,13 @@ int main(void)
 {
     init_hardware();
     init_PWM();
-
     config_ADC();
 
-    float pulse = calculate_pulse_percent(angle);
-    set_motor_angle(angle);
+    // initialize position
+    float pulse = calculate_pulse_percent(angle0);
+    set_motor0_angle(angle0);
+    pulse = calculate_pulse_percent(angle1);
+    set_motor0_angle(angle1);
     
     SysTickPeriodSet((SysCtlClockGet()/ get_sampling_rate()) - 1);
     SysTickIntEnable();
@@ -54,14 +57,17 @@ int main(void)
 void SysTickIntHandler(void)
 {
     update_sensors_data();
-    ldr1 = get_ldr_data()[0];
-    ldr2 = get_ldr_data()[1];
-    ldr3 = get_ldr_data()[2];
-    ldr4 = get_ldr_data()[3];
+    ldr0 = get_ldr_data()[0];
+    ldr1 = get_ldr_data()[1];
+    ldr2 = get_ldr_data()[2];
+    ldr3 = get_ldr_data()[3];
     pannel_vol = get_pannel_voltage();
 
-    angle = update_new_angle(angle, ldr1, ldr2);
-    set_motor_angle(angle);
+    angle0 = update_new_angle(angle0, ldr0, ldr1);
+    set_motor0_angle(angle0);
+
+    angle1 = update_new_angle(angle1, ldr2, ldr3);
+    set_motor1_angle(angle1);
 }
 
 

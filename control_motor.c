@@ -19,40 +19,26 @@ typedef struct PWMConfig {
     uint32_t gpioPeripheral;            // GPIO peripheral
     uint32_t pwmPeripheral;             // PWM peripheral
     uint32_t gpioBase;                  // GPIO port base
-    uint32_t gpioPin;                   // GPIO pin
-    uint32_t pinConfig;                 // Pin configuration
+    uint32_t gpioPin[2];                // GPIO pins
+    uint32_t pinConfig[2];                 // Pin configuration
     uint32_t pwmGen;                    // PWM generator
-    uint32_t pwmOutBit;                 // PWM output bit
-    uint32_t pwmOut;
+    uint32_t pwmOutBit[2];                 // PWM output bit
+    uint32_t pwmOut[2];
     uint32_t pwmBase;                   // PWM module base
     uint32_t pwmMode;                   // count up/down mode
     uint32_t pwdDiv;
 } PWMConfig;
 
-//static const PWMConfig motorPWM_config = {
-//    .gpioPeripheral = SYSCTL_PERIPH_GPIOB,
-//    .pwmPeripheral = SYSCTL_PERIPH_PWM0,
-//    .gpioBase = GPIO_PORTB_BASE,
-//    .gpioPin = GPIO_PIN_6,
-//    .pinConfig = GPIO_PB6_M0PWM0,
-//    .pwmGen = PWM_GEN_0,
-//    .pwmOutBit = PWM_OUT_0_BIT,
-//    .pwmOut = PWM_OUT_0,
-//    .pwmBase = PWM0_BASE,
-//    .pwmMode = PWM_GEN_MODE_DOWN,
-//    .pwdDiv = SYSCTL_PWMDIV_64
-//};
-
 static const PWMConfig motorPWM_config = {
-    .gpioPeripheral = SYSCTL_PERIPH_GPIOB,
-    .pwmPeripheral = SYSCTL_PERIPH_PWM0,
-    .gpioBase = GPIO_PORTB_BASE,
-    .gpioPin = GPIO_PIN_6,
-    .pinConfig = GPIO_PB6_M0PWM0,
-    .pwmGen = PWM_GEN_0,
-    .pwmOutBit = PWM_OUT_0_BIT,
-    .pwmOut = PWM_OUT_0,
-    .pwmBase = PWM0_BASE,
+    .gpioPeripheral = SYSCTL_PERIPH_GPIOF,
+    .pwmPeripheral = SYSCTL_PERIPH_PWM1,
+    .gpioBase = GPIO_PORTF_BASE,
+    .gpioPin = {GPIO_PIN_2, GPIO_PIN_3},
+    .pinConfig = {GPIO_PF2_M1PWM6, GPIO_PF3_M1PWM7},
+    .pwmGen = PWM_GEN_3,
+    .pwmOutBit = {PWM_OUT_6_BIT, PWM_OUT_7_BIT},
+    .pwmOut = {PWM_OUT_6, PWM_OUT_7},
+    .pwmBase = PWM1_BASE,
     .pwmMode = PWM_GEN_MODE_DOWN,
     .pwdDiv = SYSCTL_PWMDIV_64
 };
@@ -68,30 +54,13 @@ static uint32_t period;
  * PMW clock = system clock / 64
  *
  */
-//void init_PWM(void) {
-//    SysCtlPeripheralEnable(motorPWM_config.gpioPeripheral);
-//
-//    SysCtlPeripheralEnable(motorPWM_config.pwmPeripheral);
-//    GPIOPinTypePWM(motorPWM_config.gpioBase, motorPWM_config.gpioPin);
-//    GPIOPinConfigure(motorPWM_config.pinConfig);
-//
-//    SysCtlPWMClockSet(motorPWM_config.pwdDiv);
-//
-//    PWMGenConfigure(motorPWM_config.pwmBase, motorPWM_config.pwmGen, motorPWM_config.pwmMode);
-//
-//    pwmClock = SysCtlClockGet() / 64;
-//    period = (pwmClock / PWM_FREQUENCY) - 1;
-//    PWMGenPeriodSet(motorPWM_config.pwmBase, motorPWM_config.pwmGen, period);
-//
-//    PWMOutputState(motorPWM_config.pwmBase, motorPWM_config.pwmOutBit, true);
-//    PWMGenEnable(motorPWM_config.pwmBase, motorPWM_config.pwmGen);
-//}
 void init_PWM(void) {
     SysCtlPeripheralEnable(motorPWM_config.gpioPeripheral);
 
     SysCtlPeripheralEnable(motorPWM_config.pwmPeripheral);
-    GPIOPinTypePWM(motorPWM_config.gpioBase, motorPWM_config.gpioPin);
-    GPIOPinConfigure(motorPWM_config.pinConfig);
+    GPIOPinTypePWM(motorPWM_config.gpioBase, motorPWM_config.gpioPin[0]|motorPWM_config.gpioPin[1]);
+    GPIOPinConfigure(motorPWM_config.pinConfig[0]);
+    GPIOPinConfigure(motorPWM_config.pinConfig[1]);
 
     SysCtlPWMClockSet(motorPWM_config.pwdDiv);
 
@@ -101,7 +70,8 @@ void init_PWM(void) {
     period = (pwmClock / PWM_FREQUENCY) - 1;
     PWMGenPeriodSet(motorPWM_config.pwmBase, motorPWM_config.pwmGen, period);
 
-    PWMOutputState(motorPWM_config.pwmBase, motorPWM_config.pwmOutBit, true);
+    PWMOutputState(motorPWM_config.pwmBase, motorPWM_config.pwmOutBit[0], true);
+    PWMOutputState(motorPWM_config.pwmBase, motorPWM_config.pwmOutBit[1], true);
     PWMGenEnable(motorPWM_config.pwmBase, motorPWM_config.pwmGen);
 }
 
@@ -123,10 +93,16 @@ float calculate_pulse_percent(int angle) {
 /*
  * Execute rotations given angle
  */
-void set_motor_angle(int angle) {
+void set_motor0_angle(int angle) {
     uint32_t pulseWidth = (uint32_t)(calculate_pulse_percent(angle) * period / 100.0f);
 
-    PWMPulseWidthSet(motorPWM_config.pwmBase, motorPWM_config.pwmOut, pulseWidth);
+    PWMPulseWidthSet(motorPWM_config.pwmBase, motorPWM_config.pwmOut[0], pulseWidth);
+}
+
+void set_motor1_angle(int angle) {
+    uint32_t pulseWidth = (uint32_t)(calculate_pulse_percent(angle) * period / 100.0f);
+
+    PWMPulseWidthSet(motorPWM_config.pwmBase, motorPWM_config.pwmOut[1], pulseWidth);
 }
 
 
