@@ -27,8 +27,8 @@ void send_message(void);
 char acBuffer[200];
 
 int angle = 90; // Initial angle
+float ldr0;
 float ldr1;
-float ldr2;
 volatile float pannel_vol = 0;
 
 
@@ -58,11 +58,11 @@ int main(void)
 void SysTickIntHandler(void)
 {
     update_sensors_data();
-    ldr1 = get_ldr_data()[0];
-    ldr2 = get_ldr_data()[1];
+    ldr0 = get_ldr_data()[0];
+    ldr1 = get_ldr_data()[1];
     pannel_vol = get_pannel_voltage();
 
-    angle = update_new_angle(angle, ldr1, ldr2);
+    angle = update_new_angle(angle, ldr0, ldr1);
     set_motor_angle(angle);
 
     send_message();
@@ -85,21 +85,21 @@ void setup_UART(void) {
 }
 
 void send_message(void) {
-//    uint32_t noBytes = sprintf(acBuffer, "LDR0: %.2f\t LDR1: %.2f\t Angle0: %d\t LDR3: %.2f\t LDR4: %.2f\t Angle1: %d\t SolarVol: %.4f\n", ldr0, ldr1, angle0, ldr2, ldr3, angle1, pannel_vol);
+    uint32_t noBytes = sprintf(acBuffer, "ldr0: %.2f\t ldr1: %.2f\t Angle: %d\t SolarVol: %.4f\n", ldr0, ldr1, angle, pannel_vol);
 //    uint32_t noBytes = sprintf(acBuffer, "V202100405 - %d\n", (uint32_t)(ldr0));
-//    uint32_t idx;
-//    for (idx = 0; idx < noBytes; idx++)
-//    {
-//        UARTCharPut(UART0_BASE, acBuffer[idx]);
-//    }
-
-    const char *studentID = "V202100405";
-    uint32_t idx = 0;
-
-    while (studentID[idx] != '\0')
+    uint32_t idx;
+    for (idx = 0; idx < noBytes; idx++)
     {
-        UARTCharPut(UART0_BASE, studentID[idx]);
-        idx++;
+        UARTCharPut(UART0_BASE, acBuffer[idx]);
     }
+
+//    const char *studentID = "V202100405";
+//    uint32_t idx = 0;
+//
+//    while (studentID[idx] != '\0')
+//    {
+//        UARTCharPut(UART0_BASE, studentID[idx]);
+//        idx++;
+//    }
 
 }

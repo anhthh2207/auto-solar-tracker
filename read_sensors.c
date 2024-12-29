@@ -40,7 +40,7 @@ const ADC_Config adc_config = {
     .adc_channels = {ADC_CTL_CH0, ADC_CTL_CH9, ADC_CTL_CH8}, // AIN0, AIN9
     .num_channels = 4,
     .sampling_rate = 40,      // 40 Hz
-    .oversampling = 8,
+    .oversampling = 32,
 };
 
 
@@ -87,8 +87,8 @@ void update_sensors_data(void){
 
 void calculate_resistance(void) {
     int i;
-    for (i = 0; i < NUM_CHANNELS; i++) {
-        float avg_adc_value = (adcValues[i] + adcValues[i + NUM_CHANNELS]) / 2.0;
+    for (i = 0; i < NUM_CHANNELS-1; i++) {
+        float avg_adc_value = (adcValues[i] + adcValues[i + NUM_CHANNELS-1]) / 2.0;
         float input_voltage = avg_adc_value * (3.3 / 4096.0);
         float ref_res = 10000.0;
         calculated_resistance[i] = ref_res * (input_voltage / 3.3);
@@ -104,7 +104,7 @@ float* get_ldr_data(void){
 }
 
 void calculate_pannel_voltage(void){
-    float avg_adc_value = adcValues[NUM_CHANNELS-1];
+    float avg_adc_value = adcValues[4];
     float input_voltage = avg_adc_value * (3.3 / 4096.0);
     pannel_voltage = input_voltage;
 }
