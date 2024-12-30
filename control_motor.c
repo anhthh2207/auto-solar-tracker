@@ -29,16 +29,29 @@ typedef struct PWMConfig {
     uint32_t pwdDiv;
 } PWMConfig;
 
+//static const PWMConfig motorPWM_config = {
+//    .gpioPeripheral = SYSCTL_PERIPH_GPIOB,
+//    .pwmPeripheral = SYSCTL_PERIPH_PWM0,
+//    .gpioBase = GPIO_PORTB_BASE,
+//    .gpioPin = GPIO_PIN_6,
+//    .pinConfig = GPIO_PB6_M0PWM0,
+//    .pwmGen = PWM_GEN_0,
+//    .pwmOutBit = PWM_OUT_0_BIT,
+//    .pwmOut = PWM_OUT_0,
+//    .pwmBase = PWM0_BASE,
+//    .pwmMode = PWM_GEN_MODE_DOWN,
+//    .pwdDiv = SYSCTL_PWMDIV_64
+//};
 static const PWMConfig motorPWM_config = {
-    .gpioPeripheral = SYSCTL_PERIPH_GPIOB,
-    .pwmPeripheral = SYSCTL_PERIPH_PWM0,
-    .gpioBase = GPIO_PORTB_BASE,
-    .gpioPin = GPIO_PIN_6,
-    .pinConfig = GPIO_PB6_M0PWM0,
-    .pwmGen = PWM_GEN_0,
-    .pwmOutBit = PWM_OUT_0_BIT,
-    .pwmOut = PWM_OUT_0,
-    .pwmBase = PWM0_BASE,
+    .gpioPeripheral = SYSCTL_PERIPH_GPIOF,
+    .pwmPeripheral = SYSCTL_PERIPH_PWM1,
+    .gpioBase = GPIO_PORTF_BASE,
+    .gpioPin = GPIO_PIN_2,
+    .pinConfig = GPIO_PF2_M1PWM6,
+    .pwmGen = PWM_GEN_3,
+    .pwmOutBit = PWM_OUT_6_BIT,
+    .pwmOut = PWM_OUT_6,
+    .pwmBase = PWM1_BASE,
     .pwmMode = PWM_GEN_MODE_DOWN,
     .pwdDiv = SYSCTL_PWMDIV_64
 };
