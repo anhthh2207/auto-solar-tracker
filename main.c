@@ -86,20 +86,10 @@ void setup_UART(void) {
 
 void send_message(void) {
     uint32_t noBytes = sprintf(acBuffer, "ldr0: %.2f\t ldr1: %.2f\t Angle: %d\t SolarVol: %.4f\n", ldr0, ldr1, angle, pannel_vol);
-//    uint32_t noBytes = sprintf(acBuffer, "V202100405 - %d\n", (uint32_t)(ldr0));
     uint32_t idx;
     for (idx = 0; idx < noBytes; idx++)
     {
         UARTCharPut(UART0_BASE, acBuffer[idx]);
     }
-
-//    const char *studentID = "V202100405";
-//    uint32_t idx = 0;
-//
-//    while (studentID[idx] != '\0')
-//    {
-//        UARTCharPut(UART0_BASE, studentID[idx]);
-//        idx++;
-//    }
 
 }
