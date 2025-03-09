@@ -22,6 +22,7 @@ This project implements a single-axis solar tracker system. The system utilizes 
 
 Create your own setup by modifying config variables in [control_motor.c](control_motor.c) and [read_sensors.c](read_sensors.c)
 
+<!--
 ## Documentations
 - [Project proposal](docs/Embedded_Project_Proposal.pdf)
-
+-->
